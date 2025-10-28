@@ -68,9 +68,9 @@ class GeometryUtils:
     def rectangle_intersection(rect1_corners: List[Point2D], rect2_corners: List[Point2D]) -> bool:
         """
         判断两个矩形是否相交
-        使用分离轴定理(SAT)
+        使用完整的分离轴定理(SAT) + 边相交检测 + 包含检测
         """
-        # 简化版本: 检查是否有边相交
+        # 方法1: 检查所有边是否相交
         for i in range(4):
             for j in range(4):
                 if GeometryUtils.line_segment_intersection(
@@ -79,13 +79,13 @@ class GeometryUtils:
                 ):
                     return True
         
-        # 检查一个矩形的顶点是否在另一个矩形内
-        # (简化版本, 可能不完全准确, 但对于大多数情况足够)
-        for corner in rect1_corners[:1]:  # 只检查一个顶点
+        # 方法2: 检查所有顶点是否在另一个矩形内
+        # 这捕获一个矩形完全包含另一个的情况
+        for corner in rect1_corners:
             if GeometryUtils.point_in_polygon(corner, rect2_corners):
                 return True
         
-        for corner in rect2_corners[:1]:
+        for corner in rect2_corners:
             if GeometryUtils.point_in_polygon(corner, rect1_corners):
                 return True
         

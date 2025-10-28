@@ -240,14 +240,46 @@ class TimeSeriesData:
     def get_state_at_time(self, time: float, method: str = 'nearest') -> Optional[SimulationState]:
         """
         获取指定时间的状态
-        method: 'nearest' 或 'interpolate'
+        method: 'nearest' - 最近邻, 'linear' - 线性插值
         """
+        if len(self.states) == 0:
+            return None
+        
         if method == 'nearest':
             idx = np.argmin(np.abs(self.times - time))
             return self.states[idx]
+        elif method == 'linear':
+            # 线性插值
+            if time <= self.times[0]:
+                return self.states[0]
+            if time >= self.times[-1]:
+                return self.states[-1]
+            
+            # 找到包围time的两个时间点
+            idx_after = np.searchsorted(self.times, time)
+            idx_before = idx_after - 1
+            
+            t0 = self.times[idx_before]
+            t1 = self.times[idx_after]
+            state0 = self.states[idx_before]
+            state1 = self.states[idx_after]
+            
+            # 插值权重
+            alpha = (time - t0) / (t1 - t0)
+            
+            # 对位置、角度和速度进行线性插值
+            positions = (1 - alpha) * state0.positions + alpha * state1.positions
+            angles = (1 - alpha) * state0.angles + alpha * state1.angles
+            velocities = (1 - alpha) * state0.velocities + alpha * state1.velocities
+            
+            return SimulationState(
+                time=time,
+                positions=positions,
+                angles=angles,
+                velocities=velocities
+            )
         else:
-            # TODO: 实现插值
-            raise NotImplementedError("插值方法暂未实现")
+            raise ValueError(f"不支持的插值方法: {method}")
     
     def slice(self, start_time: float, end_time: float) -> 'TimeSeriesData':
         """切片,获取时间范围内的数据"""

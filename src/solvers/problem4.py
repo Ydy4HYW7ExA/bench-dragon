@@ -285,10 +285,9 @@ class Problem4Solver:
             filename="result4.xlsx"
         )
         
-        # 7. 生成可视化(暂时禁用,待修复)
-        # if self.config_dict['output'].get('enable_visualization', True):
-        #     self._generate_visualizations(time_series, uturn_path)
-        print("\n可视化功能暂时禁用")
+        # 7. 生成可视化
+        if self.config_dict['output'].get('enable_visualization', True):
+            self._generate_visualizations(time_series, uturn_path)
         
         # 8. 打印特殊时刻数据
         self._print_special_times(time_series)
@@ -299,9 +298,48 @@ class Problem4Solver:
             'success': True
         }
     
-    # def _generate_visualizations(self, time_series: TimeSeriesData, path_handler):
-    #     """生成可视化 - 暂时禁用"""
-    #     pass
+    def _generate_visualizations(self, time_series: TimeSeriesData, path_handler):
+        """生成可视化"""
+        print("\n" + "="*60)
+        print("生成可视化")
+        print("="*60)
+        
+        from ..visualization.animator import ParallelAnimationGenerator
+        
+        # 创建动画生成器
+        animator = ParallelAnimationGenerator(
+            config=self.dragon_config,
+            fps=self.config_dict['visualization'].get('fps', 30),
+            dpi=100
+        )
+        
+        # 高亮节点索引
+        highlight_indices = self.special_indices
+        
+        # 生成MP4
+        mp4_file = self.animations_dir / 'animation.mp4'
+        print(f"\n生成MP4动画: {mp4_file}")
+        animator.generate_mp4(
+            data=time_series,
+            output_path=mp4_file,
+            highlight_indices=highlight_indices,
+            frame_interval=5,
+            figsize=(14, 14)
+        )
+        
+        # 生成GIF
+        gif_file = self.animations_dir / 'animation.gif'
+        print(f"生成GIF动画: {gif_file}")
+        animator.generate_gif(
+            data=time_series,
+            output_path=gif_file,
+            highlight_indices=highlight_indices,
+            frame_interval=10,
+            figsize=(12, 12)
+        )
+        
+        print("\n可视化生成完成!")
+        print("="*60)
     
     def _print_special_times(self, time_series: TimeSeriesData):
         """打印特殊时刻的数据"""

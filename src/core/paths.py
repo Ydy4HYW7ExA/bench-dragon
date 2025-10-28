@@ -223,7 +223,8 @@ class ArcPathHandler(PathHandler):
     圆弧路径处理器
     """
     
-    def __init__(self, center: Point2D, radius: float, start_angle: float, end_angle: float, direction: str = 'counterclockwise'):
+    def __init__(self, center: Point2D, radius: float, start_angle: float, end_angle: float, 
+                 direction: str = 'counterclockwise', solver_config: Optional[dict] = None):
         """
         初始化圆弧路径
         center: 圆心
@@ -231,12 +232,20 @@ class ArcPathHandler(PathHandler):
         start_angle: 起始角度 (rad)
         end_angle: 终止角度 (rad)
         direction: 方向
+        solver_config: 求解器配置
         """
         self.center = center
         self.radius = radius
         self.start_angle = start_angle
         self.end_angle = end_angle
         self.direction_sign = 1 if direction == 'counterclockwise' else -1
+        
+        # 求解器配置
+        self.solver_config = solver_config or {}
+        self.fsolve_config = self.solver_config.get('fsolve', {
+            'xtol': 1e-12,
+            'maxfev': 10000
+        })
         
         # 计算圆弧总长度
         angle_span = abs(end_angle - start_angle)
@@ -272,21 +281,27 @@ class ArcPathHandler(PathHandler):
         """
         求解下一个点的弧长
         
-        对于圆弧, 如果沿着圆弧运动, 则直接增加弧长即可
+        对于圆弧上的点，使用精确的距离方程求解
         """
-        # 简化处理: 假设沿圆弧运动
-        next_arc_length = current_arc_length + distance
+        # 使用当前弧长作为初始猜测
+        initial_guess = current_arc_length + distance
         
-        # 也可以用精确求解
-        current_angle = self.angle_from_arc_length(current_arc_length)
-        
+        # 精确求解：找到满足距离约束的弧长
         def distance_equation(arc_length):
             pos = self.compute_position(arc_length)
             dist_sq = (pos.x - current_pos.x)**2 + (pos.y - current_pos.y)**2
             return dist_sq - distance**2
         
-        next_arc_length = fsolve(distance_equation, next_arc_length, xtol=1e-12, full_output=False)[0]
+        # 使用配置的求解器参数
+        result = fsolve(
+            distance_equation, 
+            initial_guess,
+            xtol=self.fsolve_config.get('xtol', 1e-12),
+            maxfev=self.fsolve_config.get('maxfev', 10000),
+            full_output=False
+        )
         
+        next_arc_length = float(result[0])
         return next_arc_length
 
 
