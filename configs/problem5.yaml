@@ -1,0 +1,25 @@
+# 问题5配置 - 速度优化
+inherit_from: "base.yaml"
+
+problem:
+  id: 5
+  name: "最大龙头速度问题"
+  description: "使用问题4路径,确定龙头最大速度使所有把手速度≤2m/s"
+
+path:
+  # 与问题4相同的路径参数
+  pitch: 1.7  # 螺线螺距 (m)
+  turnaround_diameter: 9.0  # 调头空间直径 (m)
+
+optimization:
+  min_velocity: 1.0  # 搜索下界 (m/s)
+  max_velocity: 3.0  # 搜索上界 (m/s)
+  tolerance: 0.0001  # 精度 (m/s) - 提高到0.1mm/s
+  max_handle_velocity: 2.0  # 速度约束 (m/s)
+  test_duration: 200.0  # 测试时长 (s) - 覆盖完整调头过程
+
+simulation:
+  time_step: 0.1
+
+output:
+  problem_dir: "outputs/problem5"

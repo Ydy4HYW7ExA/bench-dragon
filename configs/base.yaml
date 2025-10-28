@@ -1,0 +1,133 @@
+# 板凳龙基础配置
+# 此配置包含所有问题通用的物理参数
+
+dragon:
+  # 板凳参数
+  head_length: 3.41          # 龙头长度 (m)
+  body_length: 2.20          # 龙身和龙尾长度 (m)
+  bench_width: 0.30          # 板凳宽度 (m)
+  
+  # 把手参数
+  handle_offset: 0.275       # 把手距离板头的距离 (m)
+  handle_diameter: 0.055     # 把手直径 (m)
+  
+  # 龙的结构
+  num_segments: 223          # 总段数(1龙头 + 221龙身 + 1龙尾)
+  
+  # 计算的把手间距
+  head_handle_distance: 2.86  # head_length - 2*handle_offset
+  body_handle_distance: 1.65  # body_length - 2*handle_offset
+
+simulation:
+  # 仿真参数
+  time_step: 0.1            # 时间步长 (s)
+  
+  # 数值计算精度 - 极高精度
+  ode_rtol: 1.0e-12         # ODE求解相对误差
+  ode_atol: 1.0e-15         # ODE求解绝对误差
+  fsolve_xtol: 1.0e-12      # fsolve求解误差
+  
+  # 数值清理阈值
+  zero_threshold: 1.0e-10   # 接近0的值清理阈值
+  
+  # 碰撞检测
+  collision_check_enabled: false  # 暂时关闭碰撞检测
+  collision_discretization_n: 10  # 板凳长度方向离散点数
+  collision_discretization_m: 20  # 板凳宽度方向离散点数
+
+output:
+  # 输出根目录
+  root_dir: "outputs"
+  
+  # 问题输出结构 (将被每个问题配置覆盖)
+  # 每个问题的输出结构：
+  # outputs/problem{N}/
+  #   ├── results/      # Excel结果文件
+  #   ├── data/         # 仿真数据文件
+  #   ├── animations/   # 动画文件
+  #   └── figures/      # 静态图表
+  
+  problem_dir: "outputs/problem1"  # 默认，会被子配置覆盖
+  
+  # 子目录名称（相对于problem_dir）
+  results_subdir: "results"
+  data_subdir: "data"
+  animations_subdir: "animations"
+  figures_subdir: "figures"
+  
+  # 数据精度
+  decimal_places: 6
+  
+  # Excel导出
+  excel_engine: "openpyxl"
+
+visualization:
+  enabled: true
+  
+  # 图形参数
+  figure_dpi: 300
+  figure_size: [10, 10]
+  
+  # 动画参数
+  animation_fps: 10
+  animation_dpi: 150
+  video_codec: "libx264"
+  video_bitrate: "5000k"
+  
+  # 颜色方案
+  colors:
+    head: "#FF0000"          # 龙头 - 红色
+    body: "#FFD700"          # 龙身 - 金色
+    tail: "#FFD700"          # 龙尾 - 金色
+    handle: "#000000"        # 把手 - 黑色
+    highlight: "#00FF00"     # 高亮 - 绿色
+    path: "#0000FF"          # 路径 - 蓝色
+    boundary: "#808080"      # 边界 - 灰色
+  
+  # 高亮的特殊节点 (0-based index)
+  highlight_segments:
+    - 0    # 龙头前把手
+    - 1    # 第1节龙身前把手
+    - 51   # 第51节龙身前把手
+    - 101  # 第101节龙身前把手
+    - 151  # 第151节龙身前把手
+    - 201  # 第201节龙身前把手
+    - 223  # 龙尾后把手
+  
+  # 渲染选项
+  show_handles: true
+  
+  # 动画配置（子配置可覆盖）
+  animation:
+    enabled: true
+    frame_interval: 5
+    output_file: "animation.mp4"
+    gif_output_file: "animation.gif"
+    gif_frame_interval: 10  # GIF使用更大的间隔
+  
+  # 快照配置
+  snapshots:
+    enabled: false
+    times: []
+    output_pattern: "snapshot_{time}s.png"
+  
+  # 图表配置
+  plots:
+    - type: "trajectory"
+      output_file: "trajectory.png"
+    - type: "position_vs_time"
+      output_file: "position.png"
+    - type: "velocity_vs_time"
+      output_file: "velocity.png"
+  show_path: false
+  show_grid: true
+  show_legend: true
+
+logging:
+  level: "INFO"             # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/simulation.log"
+
+parallel:
+  enabled: true
+  num_workers: 4            # 并行工作线程数, -1表示使用所有CPU

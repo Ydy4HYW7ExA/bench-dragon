@@ -1,0 +1,30 @@
+# 问题4配置 - 双圆弧S形调头路径
+inherit_from: "base.yaml"
+
+problem:
+  id: 4
+  name: "双圆弧调头路径问题"
+  description: "螺线盘入 + 双圆弧S形调头 + 螺线盘出"
+
+path:
+  pitch: 1.7  # 螺线螺距 (m)
+  turnaround_diameter: 9.0  # 调头空间直径 (m)
+
+motion:
+  head_speed: 1.0  # 龙头速度 (m/s)
+  time_range: [-100, 100]  # 时间范围 (s) - 完整200秒
+  special_times: [-100, -50, 0, 50, 100]  # 特殊时刻
+  special_indices: [0, 1, 51, 101, 151, 201, 223]  # 特殊节点索引（龙头、第1/51/101/151/201节龙身、龙尾后把手）
+
+output:
+  problem_dir: "outputs/problem4"
+  decimal_places: 6
+  enable_visualization: true
+
+simulation:
+  time_step: 0.1
+  collision_discretization_n: 10
+  collision_discretization_m: 20
+
+visualization:
+  fps: 30

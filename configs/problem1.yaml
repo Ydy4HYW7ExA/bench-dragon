@@ -1,0 +1,73 @@
+# 问题1配置
+# 继承基础配置
+
+inherit_from: "base.yaml"
+
+problem:
+  id: 1
+  name: "螺线盘入问题"
+  description: "舞龙队沿等距螺线顺时针盘入"
+
+path:
+  type: "spiral"
+  spiral_pitch: 0.55        # 螺距 (m)
+  direction: "clockwise"    # 顺时针
+  initial_angle: 100.53096  # 16 * 2π (rad)
+  initial_position: "angle" # 从角度开始
+
+motion:
+  head_speed: 1.0           # 龙头速度 (m/s)
+  duration: 300             # 仿真时长 (s) - 完整300秒
+  special_times: [0, 60, 120, 180, 240, 300]  # 论文中需要的特殊时间点
+  special_indices: [0, 1, 51, 101, 151, 201, 223]  # 特殊节点索引（龙头、第1/51/101/151/201节龙身、龙尾后把手）
+
+output:
+  # 问题1专用输出目录
+  problem_dir: "outputs/problem1"
+  
+  # 结果文件
+  result_file: "result1.xlsx"
+  paper_data_file: "paper_data.xlsx"
+  simulation_data_file: "simulation.pkl"
+  
+  # 保存选项
+  save_simulation_data: true
+  
+  # 论文中需要的时间点
+  paper_times: [0, 60, 120, 180, 240, 300]
+  
+  # 导出间隔
+  export_interval: 1        # 每1秒导出一次数据
+
+visualization:
+  enabled: true
+  
+  # 动画设置（覆盖基础配置）
+  animation:
+    enabled: true
+    output_file: "animation.mp4"
+    gif_output_file: "animation.gif"
+    frame_interval: 30      # 300秒，每30帧(3秒)渲染一次，共100帧
+    gif_frame_interval: 60  # GIF每60帧(6秒)渲染一次，共50帧
+    show_spiral: true
+  
+  # 静态快照
+  snapshots:
+    enabled: false          # 关闭快照加快速度
+    times: [0, 2, 4, 6, 8, 10]
+    output_pattern: "snapshot_{time}s.png"
+  
+  # 分析图表（覆盖基础配置）
+  plots:
+    - type: "trajectory"
+      title: "舞龙队轨迹"
+      output_file: "trajectory.png"
+    
+    - type: "position_vs_time"
+      title: "位置随时间变化"
+      components: ["x", "y"]
+      output_file: "position.png"
+    
+    - type: "velocity_vs_time"
+      title: "速度随时间变化"
+      output_file: "velocity.png"

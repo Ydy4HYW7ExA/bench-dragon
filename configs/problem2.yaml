@@ -1,0 +1,29 @@
+# 问题2配置
+inherit_from: "problem1.yaml"
+
+problem:
+  id: 2
+  name: "盘入终止问题"
+  description: "确定舞龙队盘入的终止时刻(发生碰撞前)"
+
+motion:
+  # 继续问题1的运动
+  continues_from_problem: 1
+  head_speed: 1.0
+  duration: 500             # 仿真时长 (s) - 足够长以确保发生碰撞
+
+output:
+  problem_dir: "outputs/problem2"
+  result_file: "result2.xlsx"
+  save_simulation_data: true
+  simulation_data_file: "simulation.pkl"
+
+simulation:
+  collision_check_enabled: true
+  # 其他参数继承自base.yaml
+
+visualization:
+  enabled: true
+  snapshots:
+    enabled: true
+    times: []  # 只在终止时刻生成快照

@@ -1,0 +1,30 @@
+# 问题3配置
+inherit_from: "base.yaml"
+
+problem:
+  id: 3
+  name: "最小螺距问题"
+  description: "确定最小螺距,使得龙头能盘入到调头空间边界"
+
+path:
+  type: "spiral"
+  direction: "clockwise"
+
+turning:
+  radius: 4.5  # 调头空间半径 (m)
+
+motion:
+  head_speed: 1.0  # 龙头速度 (m/s)
+  duration: 500.0  # 仿真时长 (s) - 足够长以到达调头空间
+
+optimization:
+  pitch_range: [0.40, 0.60]  # 螺距搜索范围 (m) - 扩大范围
+  pitch_step: 0.001  # 螺距步长 (m) - 提高精度到1mm
+
+output:
+  problem_dir: "outputs/problem3"
+  result_file: "result3.txt"
+  save_simulation_data: false
+
+visualization:
+  enabled: false
