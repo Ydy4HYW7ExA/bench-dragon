@@ -59,8 +59,14 @@ class Problem1Solver:
         for dir_path in [self.results_dir, self.data_dir, self.animations_dir, self.figures_dir]:
             dir_path.mkdir(parents=True, exist_ok=True)
         
+        # 获取求解器配置
+        solver_config = self.config_dict['simulation'].get('solvers', {})
+        
         # 创建路径处理器
-        self.path_handler = SpiralInHandler(pitch=self.spiral_pitch)
+        self.path_handler = SpiralInHandler(
+            pitch=self.spiral_pitch,
+            solver_config=solver_config
+        )
         
         # 创建碰撞检测器(可选)
         if self.config_dict['simulation'].get('collision_check_enabled', False):

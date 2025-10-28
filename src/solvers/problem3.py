@@ -69,8 +69,14 @@ class Problem3Solver:
         
         返回: (是否到达目标, 最小半径)
         """
+        # 获取求解器配置
+        solver_config = self.config_dict['simulation'].get('solvers', {})
+        
         # 创建路径处理器
-        path_handler = SpiralInHandler(pitch=pitch)
+        path_handler = SpiralInHandler(
+            pitch=pitch,
+            solver_config=solver_config
+        )
         
         # 创建初始状态
         initial_state = create_initial_state(

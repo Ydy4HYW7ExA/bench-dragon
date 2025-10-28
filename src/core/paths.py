@@ -57,15 +57,28 @@ class SpiralPathHandler(PathHandler):
     其中 k = pitch / (2π)
     """
     
-    def __init__(self, pitch: float, direction: str = 'clockwise'):
+    def __init__(self, pitch: float, direction: str = 'clockwise', solver_config: Optional[dict] = None):
         """
         初始化螺线路径
         pitch: 螺距 (m)
         direction: 方向, 'clockwise' 或 'counterclockwise'
+        solver_config: 求解器配置 (可选)
         """
         self.pitch = pitch
         self.k = pitch / (2 * np.pi)  # 螺线系数
         self.direction_sign = -1 if direction == 'clockwise' else 1
+        
+        # 求解器配置（使用默认值或用户提供的配置）
+        self.solver_config = solver_config or {}
+        self.brentq_config = self.solver_config.get('brentq', {
+            'xtol': 1e-12,
+            'rtol': 1e-12,
+            'maxiter': 1000
+        })
+        self.fsolve_config = self.solver_config.get('fsolve', {
+            'xtol': 1e-12,
+            'maxfev': 10000
+        })
     
     def compute_position(self, theta: float) -> Point2D:
         """计算螺线上角度theta处的位置"""
@@ -174,7 +187,9 @@ class SpiralPathHandler(PathHandler):
         try:
             theta_solution = brentq(
                 distance_error, theta_min, theta_max, 
-                xtol=np.float64(1e-12), rtol=np.float64(1e-12)
+                xtol=np.float64(self.brentq_config['xtol']),
+                rtol=np.float64(self.brentq_config['rtol']),
+                maxiter=self.brentq_config['maxiter']
             )
             # brentq 返回 float，但类型检查器不确定，所以明确标注
             return float(theta_solution)  # type: ignore[arg-type]
@@ -186,7 +201,12 @@ class SpiralPathHandler(PathHandler):
             print(f"  使用fsolve作为后备方案")
             
             initial_guess = current_theta + search_direction * estimated_dtheta
-            result = fsolve(distance_error, initial_guess, xtol=1e-12, full_output=False)
+            result = fsolve(
+                distance_error, initial_guess,
+                xtol=self.fsolve_config['xtol'],
+                maxfev=self.fsolve_config['maxfev'],
+                full_output=False
+            )
             # full_output=False 时 fsolve 返回 ndarray
             theta_sol = float(result[0])  # type: ignore
             
@@ -272,8 +292,8 @@ class ArcPathHandler(PathHandler):
 
 class SpiralInHandler(SpiralPathHandler):
     """盘入螺线 (顺时针)"""
-    def __init__(self, pitch: float):
-        super().__init__(pitch, direction='clockwise')
+    def __init__(self, pitch: float, solver_config: Optional[dict] = None):
+        super().__init__(pitch, direction='clockwise', solver_config=solver_config)
 
 
 class SpiralOutHandler(SpiralPathHandler):
@@ -285,7 +305,7 @@ class SpiralOutHandler(SpiralPathHandler):
     盘出螺线是 r = k*(theta + π), 但角度theta从-π开始
     等价于: (x, y) -> (-x, -y) 的变换
     """
-    def __init__(self, pitch: float):
+    def __init__(self, pitch: float, solver_config: Optional[dict] = None):
         """
         初始化盘出螺线
         盘出螺线方程: r = k * (theta + π)
@@ -293,6 +313,18 @@ class SpiralOutHandler(SpiralPathHandler):
         self.pitch = pitch
         self.k = pitch / (2 * np.pi)
         self.direction_sign = 1  # 逆时针
+        
+        # 求解器配置
+        self.solver_config = solver_config or {}
+        self.brentq_config = self.solver_config.get('brentq', {
+            'xtol': 1e-12,
+            'rtol': 1e-12,
+            'maxiter': 1000
+        })
+        self.fsolve_config = self.solver_config.get('fsolve', {
+            'xtol': 1e-12,
+            'maxfev': 10000
+        })
     
     def compute_position(self, theta: float) -> Point2D:
         """计算盘出螺线上的位置"""

@@ -30,6 +30,25 @@ simulation:
   # 数值清理阈值
   zero_threshold: 1.0e-10   # 接近0的值清理阈值
   
+  # 方程求解器参数
+  solvers:
+    # Brent方法求解器（主要用于路径参数求解）
+    brentq:
+      xtol: 1.0e-12         # 绝对容差
+      rtol: 1.0e-12         # 相对容差
+      maxiter: 1000         # 最大迭代次数
+    
+    # Powell混合法求解器（备用求解器）
+    fsolve:
+      xtol: 1.0e-12         # 容差
+      maxfev: 10000         # 最大函数评估次数
+    
+    # 根标量求解器（用于初始状态求解）
+    root_scalar:
+      xtol: 1.0e-12         # 绝对容差
+      rtol: 1.0e-12         # 相对容差
+      maxiter: 100          # 最大迭代次数
+  
   # 碰撞检测
   collision_check_enabled: false  # 暂时关闭碰撞检测
   collision_discretization_n: 10  # 板凳长度方向离散点数

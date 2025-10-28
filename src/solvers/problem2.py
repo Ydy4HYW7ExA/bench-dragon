@@ -47,8 +47,14 @@ class Problem2Solver:
         self.output_dir = Path(self.config_dict['output']['results_dir'])
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
+        # 获取求解器配置
+        solver_config = self.config_dict['simulation'].get('solvers', {})
+        
         # 创建路径处理器
-        self.path_handler = SpiralInHandler(pitch=self.spiral_pitch)
+        self.path_handler = SpiralInHandler(
+            pitch=self.spiral_pitch,
+            solver_config=solver_config
+        )
         
         # 创建碰撞检测器
         self.collision_detector = CollisionDetector(
