@@ -47,7 +47,7 @@ visualization:
     enabled: true
     output_file: "animation.mp4"
     gif_output_file: "animation.gif"
-    frame_interval: 30      # 300秒，每30帧(3秒)渲染一次，共100帧
+    frame_interval: 5       # 300秒，每5帧(0.05秒)渲染一次，共100帧
     gif_frame_interval: 60  # GIF每60帧(6秒)渲染一次，共50帧
     show_spiral: true
   

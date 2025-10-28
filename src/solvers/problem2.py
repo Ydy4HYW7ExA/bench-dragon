@@ -44,8 +44,13 @@ class Problem2Solver:
         self.time_step = self.config_dict['simulation'].get('time_step', 0.01)
         
         # 输出设置
-        self.output_dir = Path(self.config_dict['output']['results_dir'])
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+        output_cfg = self.config_dict['output']
+        self.problem_dir = Path(output_cfg['problem_dir'])
+        self.results_dir = self.problem_dir / output_cfg.get('results_subdir', 'results')
+        self.data_dir = self.problem_dir / output_cfg.get('data_subdir', 'data')
+        
+        for dir_path in [self.results_dir, self.data_dir]:
+            dir_path.mkdir(parents=True, exist_ok=True)
         
         # 获取求解器配置
         solver_config = self.config_dict['simulation'].get('solvers', {})
@@ -65,7 +70,7 @@ class Problem2Solver:
         
         # 创建数据导出器
         decimal_places = self.config_dict['output'].get('decimal_places', 6)
-        self.exporter = DataExporter(self.output_dir, decimal_places)
+        self.exporter = DataExporter(self.results_dir, decimal_places)
         
         # 初始状态(将从问题1导入)
         self.initial_state: Optional[SimulationState] = None
@@ -188,7 +193,7 @@ class Problem2Solver:
         self.exporter.export_problem1_result(data, self.dragon_config, result_file)
         
         # 额外保存碰撞时间信息
-        info_file = self.output_dir / "collision_info.txt"
+        info_file = self.results_dir / "collision_info.txt"
         with open(info_file, 'w', encoding='utf-8') as f:
             f.write("=" * 60 + "\n")
             f.write("问题2结果 - 碰撞检测\n")
@@ -204,7 +209,7 @@ class Problem2Solver:
             f.write(f"  时间步长: {self.time_step} s\n")
             f.write("\n" + "=" * 60 + "\n")
         
-        print(f"结果已导出到: {self.output_dir}")
+        print(f"结果已导出到: {self.results_dir}")
         print("=" * 60)
     
     def generate_visualization(self, data: TimeSeriesData, collision_time: Optional[float]):
